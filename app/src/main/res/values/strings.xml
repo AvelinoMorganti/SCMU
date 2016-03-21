@@ -12,4 +12,7 @@
     <string name="textLocation">Set current location as home? </string>
     <string name="textYes">Yes</string>
     <string name="textBack">Back</string>
+    <string name="textLogin">Login</string>
+    <string name="textPassword">Password</string>
+    <string name="textEnter">Enter</string>
 </resources>
