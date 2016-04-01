@@ -11,17 +11,17 @@ public class MySQLConnector {
     private static final String DRIVER = "com.mysql.jdbc.Driver";
     private static final String BD = "whaves_scmu";
 
-    /*
+    
      private static final String BD_IP = "whaves.com"; //Ou 184.107.114.5
      private static final String URL = "jdbc:mysql://" + BD_IP + "/" + BD;
      private static final String USERNAME = "whaves_scmu";
      private static final String PASSWORD = "BbV;6)>sPO6qrh{O[)";
      //whaves.com/PasswordGenerator/index.jsp
-     */
+     /*
     private static final String BD_IP = "localhost";
     private static final String URL = "jdbc:mysql://" + BD_IP + "/" + BD;
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "multivack23";
+    private static final String PASSWORD = "multivack23";*/
 
     private Connection connection = null;
     private Statement statement;

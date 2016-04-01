@@ -76,8 +76,7 @@ public class DAOAccount {
                 insert.setString(3, account.getPassword());
                 insert.setString(4, account.getSalt());
                 insert.setString(5, "0");
-                
-                
+
                 insert.setLong(6, properties.getId());
                 //JOptionPane.showMessageDialog(null, "testeeeee" + properties.getId());
                 insert.executeUpdate();
@@ -87,6 +86,33 @@ public class DAOAccount {
 
             } catch (ClassNotFoundException | SQLException ex) {
                 JOptionPane.showMessageDialog(null, "Erro:" + ex.getLocalizedMessage() + "\n\n" + ex.getMessage());
+                Logger.getLogger(MySQLAuthenticator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
+
+    /*    
+     Recebe um objeto Account, atualiza no banco.
+     */
+    public boolean updateAccount(String username, int idState) {
+        if (idState != 0) {
+            try {
+                MySQLConnector conn = new MySQLConnector();
+                conn.connect();
+
+                PreparedStatement update
+                        = conn.getConnection().prepareStatement("UPDATE account "
+                                + "SET properties_idproperties = ? "
+                                + "WHERE username = ?");
+
+                update.setInt(1, idState);
+                update.setString(2, username);
+                update.executeUpdate();
+                conn.closeConnection();
+                return true;
+
+            } catch (ClassNotFoundException | SQLException ex) {
                 Logger.getLogger(MySQLAuthenticator.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

@@ -101,8 +101,8 @@ public class login extends HttpServlet {
                         //passwordCookie.setMaxAge(60 * 60 * 24 * 7); //Store cookie for 1 week
                         response.addCookie(usernameCookie);
                         response.addCookie(passwordCookie);
-                        JOptionPane.showMessageDialog(null, new Gson().toJson(usernameCookie).toString());
-                        JOptionPane.showMessageDialog(null, new Gson().toJson(passwordCookie).toString());
+                        //JOptionPane.showMessageDialog(null, new Gson().toJson(usernameCookie).toString());
+                        //JOptionPane.showMessageDialog(null, new Gson().toJson(passwordCookie).toString());
                         //Redireciona para home
                         response.sendRedirect("home.jsp");
                     }
