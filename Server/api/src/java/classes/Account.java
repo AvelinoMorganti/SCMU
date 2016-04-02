@@ -41,8 +41,6 @@ public class Account {
         this.idProperties = idProperties;
     }
 
-
-
     public Account() {
     }
 

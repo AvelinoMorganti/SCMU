@@ -1,5 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license header, choose License Headers in Project State.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -9,7 +9,7 @@ package classes;
  *
  * @author avelino
  */
-public class Properties {
+public class State {
 
     private long id;
     private boolean lamp;
@@ -20,10 +20,10 @@ public class Properties {
     private double harmfulGases;
     private double luminosity;
 
-    public Properties() {
+    public State() {
     }
 
-    public Properties(long id, 
+    public State(long id, 
             boolean lamp, 
             boolean alarm, 
             boolean smsNotifications, 
@@ -65,12 +65,12 @@ public class Properties {
         this.alarm = alarm;
     }
 
-    public boolean isSms_notifications() {
+    public boolean isSmsNotifications() {
         return smsNotifications;
     }
 
-    public void setSms_notifications(boolean sms_notifications) {
-        this.smsNotifications = sms_notifications;
+    public void setSmsNotifications(boolean smsNotifications) {
+        this.smsNotifications = smsNotifications;
     }
 
     public String getLatitude() {

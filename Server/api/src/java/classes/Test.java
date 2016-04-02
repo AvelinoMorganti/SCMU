@@ -1,11 +1,12 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license header, choose License Headers in Project State.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package classes;
 
-import DAO.DAOProperties;
+import DAO.DAOAccount;
+import DAO.DAOState;
 import com.google.gson.Gson;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,8 +20,8 @@ import org.json.simple.JSONObject;
 public class Test {
 
     public static void main(String args[]) throws ClassNotFoundException, SQLException {
-        MySQLAuthenticator auth = new MySQLAuthenticator();
-       /*  DAOProperties daoP = new DAOProperties();
+        DAOAccount auth = new DAOAccount();
+       /*  DAOState daoP = new DAOState();
 
          Account a[] = new Account[10];
          a[0] = new Account("avelino", "123");
@@ -34,7 +35,7 @@ public class Test {
          a[8] = new Account("ines", "123");
          a[9] = new Account("patricia", "123");
 
-         Properties p[] = new Properties[10];
+         State p[] = new State[10];
          long s = 1;
          for (int i = 0; i < 10; i++, s++) {
 
@@ -49,7 +50,7 @@ public class Test {
          if (((int) (Math.random() * 2)) == 1) {
          b3 = true;
          }
-         p[i] = new Properties(-1, b1, b2, b3, "-31", "8", (Math.random() * 100), (Math.random() * 100));
+         p[i] = new State(-1, b1, b2, b3, "-31", "8", (Math.random() * 100), (Math.random() * 100));
 
          daoP.insertProperties(p[i]);
          int id = daoP.lastRegisterProperties();
@@ -60,7 +61,7 @@ public class Test {
 
          //Properties pOk = daoP.getPropertiesByID(3);
          //System.out.println(new Gson().toJson(pOk).toString());
-         //Properties p = new Properties(0, true, true, true, "-1", "1", (Math.random() * 100), (Math.random() * 100));
+         //Properties p = new State(0, true, true, true, "-1", "1", (Math.random() * 100), (Math.random() * 100));
          //daoP.insertProperties(p);
          //Properties pOk = daoP.getPropertiesByID(300);
          //auth.createAccount(c, pOk);
@@ -77,7 +78,7 @@ public class Test {
          System.out.println("\n\n" + new Gson().toJson(account).toString());
        
         
-        /*Properties a = loadUserFromJSONGson("");
+        /*State a = loadUserFromJSONGson("");
         System.out.println(
                 "\nid = " + a.getId()
                 + "\nlamp = " + a.isLamp()
@@ -90,10 +91,10 @@ public class Test {
 
     }
 
-    public static Properties loadUserFromJSONGson(String jsonString) {
+    public static State loadUserFromJSONGson(String jsonString) {
         jsonString = "{\"id\":114,\"lamp\":true,\"alarm\":false,\"smsNotifications\":true,\"latitude\":\"-31\",\"longitude\":\"8\",\"harmfulGases\":15.9943,\"luminosity\":50.4646}";
         Gson gson = new Gson();
-        Properties user = gson.fromJson(jsonString, Properties.class);
+        State user = gson.fromJson(jsonString, State.class);
         return user;
     }
 

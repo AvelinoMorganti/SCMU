@@ -1,14 +1,14 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license header, choose License Headers in Project State.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package servlets;
 
-import DAO.DAOProperties;
+import DAO.DAOAccount;
+import DAO.DAOState;
 import classes.Account;
-import classes.MySQLAuthenticator;
-import classes.Properties;
+import classes.State;
 import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -41,7 +41,7 @@ public class getState extends HttpServlet {
         String passwordHasheada = null;
         String username = null;
         Account user;
-        MySQLAuthenticator auth = new MySQLAuthenticator();
+        DAOAccount auth = new DAOAccount();
         boolean login = false;
 
         if (cookies != null) {
@@ -58,12 +58,12 @@ public class getState extends HttpServlet {
 
             if ((username != null) && (passwordHasheada != null)) {
                 user = auth.getAccount(username);
-// if ((username != null) && (passwordHasheada != null)) {
+                // if ((username != null) && (passwordHasheada != null)) {
                 if (user.getUsername().equals(username) && (user.getPassword().equals(passwordHasheada))) {
                     login = true;
 
-                    DAOProperties daoP = new DAOProperties();
-                    Properties p = daoP.getPropertiesByID(user.getIdProperties());
+                    DAOState daoP = new DAOState();
+                    State p = daoP.getStateByID(user.getIdProperties());
 
                     String json = new Gson().toJson(p);
                     response.getWriter().write(json);

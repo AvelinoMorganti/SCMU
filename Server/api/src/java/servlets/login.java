@@ -5,10 +5,9 @@
  */
 package servlets;
 
+import DAO.DAOAccount;
 import classes.Account;
-import classes.MySQLAuthenticator;
 import classes.hashPassword;
-import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -43,7 +42,7 @@ public class login extends HttpServlet {
             String usernameRequest = request.getParameter("username").toLowerCase();
 
             Account account = null;
-            MySQLAuthenticator my = new MySQLAuthenticator();
+            DAOAccount my = new DAOAccount();
 
             //Validação da quantidade de caracteres
             //Valida se o conteúdo é vazio ou null

@@ -16,7 +16,6 @@ public class MySQLConnector {
      private static final String URL = "jdbc:mysql://" + BD_IP + "/" + BD;
      private static final String USERNAME = "whaves_scmu";
      private static final String PASSWORD = "BbV;6)>sPO6qrh{O[)";
-     //whaves.com/PasswordGenerator/index.jsp
      /*
     private static final String BD_IP = "localhost";
     private static final String URL = "jdbc:mysql://" + BD_IP + "/" + BD;

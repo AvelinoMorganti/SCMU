@@ -1,19 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license header, choose License Headers in Project State.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package servlets;
 
 import DAO.DAOAccount;
-import DAO.DAOProperties;
+import DAO.DAOState;
 import classes.Account;
-import classes.MySQLAuthenticator;
-import classes.Properties;
+import classes.State;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.PrintWriter;
-import static java.lang.System.out;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -37,6 +34,8 @@ public class setState extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+       
+        
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -46,7 +45,7 @@ public class setState extends HttpServlet {
         String passwordHasheada = null;
         String username = null;
         Account user;
-        MySQLAuthenticator auth = new MySQLAuthenticator();
+        DAOAccount auth = new DAOAccount();
         boolean login = false;
 
         if (cookies != null) {
@@ -68,11 +67,11 @@ public class setState extends HttpServlet {
                     login = true;
 
                     Gson gson = new Gson();
-                    Properties a = gson.fromJson(jsonString, Properties.class);
+                    State a = gson.fromJson(jsonString, State.class);
 
-                    DAOProperties daoP = new DAOProperties();
-                    daoP.insertProperties(a);
-                    int lastState = daoP.lastRegisterProperties();
+                    DAOState daoP = new DAOState();
+                    daoP.insertState(a);
+                    int lastState = daoP.getLastRegisterState();
 
                     DAOAccount daoA = new DAOAccount();
                     daoA.updateAccount(user.getUsername(), lastState);

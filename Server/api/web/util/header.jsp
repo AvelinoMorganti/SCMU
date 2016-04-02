@@ -1,6 +1,5 @@
-<%@page import="com.google.gson.Gson"%>
 <%@page import="javax.swing.JOptionPane"%>
-<%@page import="classes.MySQLAuthenticator"%>
+<%@page import="DAO.DAOAccount"%>
 <%@page import="classes.Account"%>
 <%
 
@@ -8,7 +7,7 @@
     String passwordHasheada = null;
     String username = null;
     Account user;
-    MySQLAuthenticator auth = new MySQLAuthenticator();
+    DAOAccount auth = new DAOAccount();
     boolean login = false;
 
     if (cookies != null) {
@@ -27,7 +26,7 @@
 
         if ((username != null) && (passwordHasheada != null)) {
             user = auth.getAccount(username);
-            JOptionPane.showMessageDialog(null, "objeto user" + new Gson().toJson(user));
+            //JOptionPane.showMessageDialog(null, "objeto user" + new Gson().toJson(user));
 
             if (user.getUsername().equals(username) && (user.getPassword().equals(passwordHasheada))) {
                 login = true;

@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package DAO;
 
-import classes.MySQLAuthenticator;
-import classes.Properties;
+import classes.State;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,11 +12,11 @@ import javax.swing.JOptionPane;
  *
  * @author avelino
  */
-public class DAOProperties {
+public class DAOState {
 
-    public int lastRegisterProperties() {
+    public int getLastRegisterState() {
 
-        String sql = "SELECT * FROM properties WHERE idproperties IN (SELECT MAX(idproperties) FROM properties)";
+        String sql = "SELECT * FROM state WHERE idstate IN (SELECT MAX(idstate) FROM state)";
         int count = 0;
         try {
 
@@ -39,16 +33,14 @@ public class DAOProperties {
             }
 
         } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(MySQLAuthenticator.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, ex.getMessage() + "\n" + ex.getLocalizedMessage());
         }
 
         return count;
     }
 
-    public Properties getPropertiesByID(long id) {
+    public State getStateByID(long id) {
 
-        Properties p = null;
+        State p = null;
 
         try {
 
@@ -57,7 +49,7 @@ public class DAOProperties {
 
             PreparedStatement getUser
                     = conn.getConnection().prepareStatement("SELECT "
-                            + "idproperties, "
+                            + "idstate, "
                             + "lamp, "
                             + "alarm, "
                             + "smsNotifications, "
@@ -65,7 +57,7 @@ public class DAOProperties {
                             + "longitude, "
                             + "harmfulGases, "
                             + "luminosity "
-                            + "FROM properties WHERE idproperties = ?");
+                            + "FROM state WHERE idstate = ?");
 
             getUser.setLong(1, id);
 
@@ -96,28 +88,26 @@ public class DAOProperties {
 
                 conn.closeConnection();
 
-                p = new Properties(id, tmpLamp, tmpAlarm, tmpSMSNotifications, tmpLatitude, tmpLongitude, harmfulGases, luminosity);
+                p = new State(id, tmpLamp, tmpAlarm, tmpSMSNotifications, tmpLatitude, tmpLongitude, harmfulGases, luminosity);
             }
 
         } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(MySQLAuthenticator.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, ex.getMessage() + "\n" + ex.getLocalizedMessage());
         }
         return p;
     }
 
-    public boolean insertProperties(Properties properties) {
+    public boolean insertState(State properties) {
         if (properties != null) {
             try {
                 MySQLConnector conn = new MySQLConnector();
                 conn.connect();
-                PreparedStatement insert = conn.getConnection().prepareStatement("INSERT INTO properties VALUES(?,?,?,?,?,?,?,?)");
+                PreparedStatement insert = conn.getConnection().prepareStatement("INSERT INTO state VALUES(?,?,?,?,?,?,?,?)");
 
                 insert.setInt(1, 0);
                 //insert.setBoolean(2, "" + ((properties.isLamp()) ? 1 : 0));
                 insert.setBoolean(2, properties.isLamp());
                 insert.setBoolean(3, properties.isAlarm());
-                insert.setBoolean(4, properties.isSms_notifications());
+                insert.setBoolean(4, properties.isSmsNotifications());
                 insert.setString(5, properties.getLatitude());
                 insert.setString(6, properties.getLongitude());
                 insert.setDouble(7, properties.getHarmfulGases());
@@ -128,7 +118,6 @@ public class DAOProperties {
                 return true;
 
             } catch (ClassNotFoundException | SQLException ex) {
-                Logger.getLogger(MySQLAuthenticator.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return false;

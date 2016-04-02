@@ -1,9 +1,7 @@
-<%@page import="java.util.ArrayList"%>
+
 <%@page import="java.util.List"%>
 <%@page import="classes.Account"%>
-<%@page import="DAO.DAOUsers"%>
-<%@page import="classes.MySQLAuthenticator"%>
-
+<%@page import="DAO.DAOAccount"%>
 
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
