@@ -23,8 +23,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.*;
-
 
 /**
  * Created by avelino on 16/03/16.
@@ -58,92 +56,13 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             String json = "http://whaves.com/app/api.json";
             String url_login = "http://whaves.com/api/login";
 
-            CookieManager cookieManager = new CookieManager();
-            CookieHandler.setDefault(cookieManager);
-            String res="";
-            try {
-                URL url = new URL(url_login);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                                List<String> values = new ArrayList<String>();
-                values.add("login" + "=" + URLEncoder.encode(login, "UTF-8"));
-                values.add("password" + "=" + URLEncoder.encode(pass, "UTF-8"));
-
-                StringBuilder result = new StringBuilder();
-                for (String param : values) {
-                    if (result.length() == 0) {
-                        result.append(param);
-                    } else {
-                        result.append("&" + param);
-                    }
-                }
-                String toSend = result.toString();
-                conn.setDoOutput(true);
-                conn.setDoInput(true);
-
-                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-                wr.writeBytes(toSend);
-                wr.flush();
-                wr.close();
-
-                int responseCode =  conn.getResponseCode();
-                 res =  Integer.toString(responseCode);
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this);
-            dialog.setMessage(res);
-            dialog.setNeutralButton("OK", null);
-            dialog.show();
-
-
             Intent it = new Intent(this, MainActivity.class);
             //it.putExtra("VALOR",edtValor.getText().toString());
             startActivity(it);
         }
     }
 
-    public void postData() {
-        // Create a new HttpClient and Post Header
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://www.yoursite.com/script.php");
+    //  String page = getPageContent("whaves.com/api/login?username=avelino&password=123");
 
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-            nameValuePairs.add(new BasicNameValuePair("stringdata", "Hi"));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        }
-    }
-    /*private void autenticar() {
-        CookieHandler.setDefault(new CookieManager());
-
-        try {
-            String page = getPageContent("whaves.com/api/login?username=avelino&password=123");
-            String postParams = getFormParams(page, "membro", "membro");
-
-            sendPost("", postParams);
-
-            String result = getPageContent(url);
-
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
-    }*/
 
 }
