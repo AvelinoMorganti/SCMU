@@ -1,13 +1,18 @@
 package com.whaves.scmu;
 
 import android.app.Activity;
-        import android.content.Intent;
+import android.app.AlertDialog;
+import android.content.Intent;
         import android.os.Bundle;
         import android.view.View;
         import android.widget.Button;
+import android.widget.EditText;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by avelino on 16/03/16.
@@ -15,6 +20,7 @@ import java.net.CookieManager;
 public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button buttonSettings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,22 +30,23 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         buttonSettings = (Button) findViewById(R.id.buttonSettings);
         buttonSettings.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View v) {
         if(v == buttonSettings){
-            Intent it = new Intent(this, SettingsActivity.class);
+Intent it = new Intent(this, SettingsActivity.class);
             //it.putExtra("VALOR",edtValor.getText().toString());
             startActivity(it);
         }
     }
 
-    /*private void autenticar() {
+  /* private void autenticar() {
         CookieHandler.setDefault(new CookieManager());
 
         try {
-            String page = getPageContent(URL_AUTENTICAR);
+            String page = getPageContent("http://whaves.com/api/login");
             String postParams = getFormParams(page, "membro", "membro");
 
             sendPost("", postParams);
