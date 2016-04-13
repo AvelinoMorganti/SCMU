@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/avelino/Dropbox (WHAVES)/GitHub/SCMU/Client/app/libs/volley.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="d4aaa36e04ee71a83444f8367c97a46fda662d2c">
+        <dex dex="/home/avelino/Dropbox (WHAVES)/GitHub/SCMU/Client/app/build/intermediates/pre-dexed/debug/volley_ac3fc4d4777fa52e24c5000b1f7d842c336b93b8.jar" />
+    </item>
+
+</items>

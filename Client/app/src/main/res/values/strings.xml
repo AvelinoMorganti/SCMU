@@ -15,4 +15,10 @@
     <string name="textLogin">Login</string>
     <string name="textPassword">Password</string>
     <string name="textEnter">Enter</string>
+
+
+    <string name="action_settings">Configurar</string>
+
+    <string name="gps_msg">Posição atual: </string>
+
 </resources>

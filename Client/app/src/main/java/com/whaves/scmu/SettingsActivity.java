@@ -1,6 +1,9 @@
     package com.whaves.scmu;
 
     import android.app.Activity;
+    import android.app.AlertDialog;
+    import android.content.Intent;
+    import android.location.LocationListener;
     import android.os.Bundle;
     import android.view.View;
     import android.widget.Button;
@@ -13,6 +16,7 @@
     public class SettingsActivity extends Activity implements View.OnClickListener {
 
         private Button buttonBack;
+        private Button buttonYes;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -22,11 +26,28 @@
             buttonBack = (Button) findViewById(R.id.buttonBack);
             buttonBack.setOnClickListener(this);
 
+            buttonYes = (Button) findViewById(R.id.buttonYes);
+            buttonYes.setOnClickListener(this);
+
         }
 
         public void onClick(View v){
             if(v == buttonBack){
                 finish();
+            }
+            if (v == buttonYes) {
+
+
+
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
+                dialog.setMessage("Request de dados:");
+                dialog.setNeutralButton("OK", null);
+                dialog.show();
+
+                //Intent it = new Intent(this, GPS.class);
+                //it.putExtra("VALOR",edtValor.getText().toString());
+                //startActivity(it);
             }
         }
 

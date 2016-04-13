@@ -12,21 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
 
-/**
- * Created by avelino on 16/03/16.
- */
 public class LoginActivity extends Activity implements View.OnClickListener{
 
     private Button buttonSettings;
@@ -56,13 +46,37 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             String json = "http://whaves.com/app/api.json";
             String url_login = "http://whaves.com/api/login";
 
+            CookieManager cookieManager = new CookieManager();
+            CookieHandler.setDefault(cookieManager);
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this);
+            dialog.setMessage("login");
+            dialog.setNeutralButton("OK", null);
+            dialog.show();
+
+
             Intent it = new Intent(this, MainActivity.class);
             //it.putExtra("VALOR",edtValor.getText().toString());
             startActivity(it);
         }
     }
 
-    //  String page = getPageContent("whaves.com/api/login?username=avelino&password=123");
 
+    /*private void autenticar() {
+        CookieHandler.setDefault(new CookieManager());
+
+        try {
+            String page = getPageContent("whaves.com/api/login?username=avelino&password=123");
+            String postParams = getFormParams(page, "membro", "membro");
+
+            sendPost("", postParams);
+
+            String result = getPageContent(url);
+
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }*/
 
 }

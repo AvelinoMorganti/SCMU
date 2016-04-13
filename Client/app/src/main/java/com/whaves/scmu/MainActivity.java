@@ -3,9 +3,9 @@ package com.whaves.scmu;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-        import android.os.Bundle;
-        import android.view.View;
-        import android.widget.Button;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import java.net.CookieHandler;
@@ -17,7 +17,7 @@ import java.net.URL;
 /**
  * Created by avelino on 16/03/16.
  */
-public class MainActivity extends Activity implements View.OnClickListener{
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private Button buttonSettings;
 
@@ -35,10 +35,16 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        if(v == buttonSettings){
-Intent it = new Intent(this, SettingsActivity.class);
+        if (v == buttonSettings) {
+            Intent itSettings = new Intent(this, SettingsActivity.class);
+            Intent itGPS = new Intent(this, GPS.class);
             //it.putExtra("VALOR",edtValor.getText().toString());
-            startActivity(it);
+
+
+            startActivity(itSettings);
+            startActivity(itGPS);
+            //it.putExtra("VALOR",edtValor.getText().toString());
+
         }
     }
 

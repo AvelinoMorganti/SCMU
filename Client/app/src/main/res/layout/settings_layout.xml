@@ -6,7 +6,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="350dp">
+        android:layout_height="fill_parent">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -60,7 +60,32 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/textViewHello"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/gps_msg"
+                android:padding="15sp" />
+
+            <ScrollView android:id="@+id/scroller"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewHello"
+                android:layout_weight="0.65">
+
+                <EditText
+                    android:id="@+id/editTextPosicoes"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:inputType="none"
+                    android:textSize="10sp"
+                    android:gravity="top|left"
+                    android:focusable="false" />
+
+            </ScrollView>
 
             <Button
                 android:layout_width="200dp"
