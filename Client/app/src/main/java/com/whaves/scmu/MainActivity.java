@@ -36,12 +36,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v == buttonSettings) {
-            Intent itSettings = new Intent(this, SettingsActivity.class);
+            //Intent itSettings = new Intent(this, SettingsActivity.class);
             Intent itGPS = new Intent(this, GPS.class);
             //it.putExtra("VALOR",edtValor.getText().toString());
 
 
-            startActivity(itSettings);
+            //startActivity(itSettings);
             startActivity(itGPS);
             //it.putExtra("VALOR",edtValor.getText().toString());
 
