@@ -4,65 +4,88 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-/**
- * Created by avelino on 16/03/16.
- */
-public class MainActivity extends Activity implements View.OnClickListener {
+import org.apache.http.client.CookieStore;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.cookie.CookieOrigin;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.json.JSONArray;
+import org.json.JSONException;
 
-    private Button buttonSettings;
+import java.lang.reflect.Type;
+import java.net.HttpCookie;
+import java.util.ArrayList;
+import java.util.List;
 
+
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
-        //setContentView(R.layout.login);
+        setContentView(R.layout.painel);
 
-        buttonSettings = (Button) findViewById(R.id.buttonSettings);
-        buttonSettings.setOnClickListener(this);
+        Intent itLogin = new Intent(this, LoginActivity.class);
+        startActivity(itLogin);
 
+        /*
+        *
+        *
+        * Se voltar para MainActivity chamar Painel ou Login*/
+
+
+    }
+
+    public void showMessage(String msg, String button) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+        dialog.setMessage(msg);
+        dialog.setNeutralButton(button, null);
+        dialog.show();
     }
 
     @Override
-    public void onClick(View v) {
-        if (v == buttonSettings) {
-            Intent itSettings = new Intent(this, SettingsActivity.class);
-            //Intent itGPS = new Intent(this, GPS.class);
-            //it.putExtra("VALOR",edtValor.getText().toString());
-
-
-            startActivity(itSettings);
-            //startActivity(itGPS);
-            //it.putExtra("VALOR",edtValor.getText().toString());
-
-        }
+    public void onBackPressed() {
+        //Intent it = new Intent(this, PainelActivity.class);
+        //startActivity(it);
     }
 
-  /* private void autenticar() {
-        CookieHandler.setDefault(new CookieManager());
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        showMessage("onRestart", "onRestart");
+        Intent it = new Intent(this, LoginActivity.class);
+        startActivity(it);
+    }
 
-        try {
-            String page = getPageContent("http://whaves.com/api/login");
-            String postParams = getFormParams(page, "membro", "membro");
+    @Override
+    public void onPause() {
+        super.onPause();
+        showMessage("onPause", "onPause");
+    }
 
-            sendPost("", postParams);
+    @Override
+    public void onResume() {
+        super.onResume();
+        showMessage("onResume", "onResume");
+    }
 
-            String result = getPageContent(url);
+    @Override
+    public void onStart() {
+        super.onStart();
+        showMessage("onStart", "onStart");
+    }
 
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
+    /*@Override
+    public void onStop() {
+        super.onStop();
+        showMessage("onStop", "onStop");
     }*/
-
 }

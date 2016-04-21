@@ -13,19 +13,25 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.app.Activity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ToggleButton;
+
+import com.google.gson.Gson;
 
 
 public class SettingsActivity extends Activity implements LocationListener {
 
+    private String latitude;
+    private String longitude;
+    private String altitude;
+    private String _precisao;
+    private String username;
+    private String password;
+    private Request request;
+    private State state;
 
-
-    private int precisaoMinimaExigida = 50;//2000    // Precisão do serviço de localização em metros.
-
+    private int precisaoMinimaExigida = 30;//2000    // Precisão do serviço de localização em metros.
     private int intervaloTempoLeituraGPS = 1000; // De quanto em quanto tempo (milissegundos) avisará que mudou de posição.
     private int distanciaLeituraGPS = 10;         // De quantos em quantos metros avisará que mudou a posição.
-
     private int intervaloTempoREDE = 1000;       // De quanto em quanto tempo (milissegundos) avisará que mudou de posição.
     private int distanciaREDE = 10;               // De quantos em quantos metros avisará que mudou posição.
 
@@ -51,12 +57,36 @@ public class SettingsActivity extends Activity implements LocationListener {
     // (deslizando a tela para baixo e clicando no ícone do GPS, por exemplo).
     // Isso é necessário porque durante a execução, o usuário tem como mudar as configurações de localização sem usar o próprio aplicativo.
 
+    public void onClick(View view) {
+
+
+    }
 
     public void setGPS(View view) {
+
+        //Requests funcionando...
+
+        request = new Request();
+        String req = request.getStateJSON(username, password);
+
+        Gson gson = new Gson();
+        State state = gson.fromJson(req, State.class);
+        state.setLatitude(latitude);
+        state.setLongitude(longitude);
+
+        String json = gson.toJson(state);
+
+        request.setStateJSON(username, password, json);
+
+
         AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-        dialog.setMessage("setGPS");
+        dialog.setMessage("The position of your home has been updated");
         dialog.setNeutralButton("OK", null);
         dialog.show();
+    }
+
+    public void back(View v) {
+        finish();
     }
 
     BroadcastReceiver bReceiver = new BroadcastReceiver() {
@@ -72,7 +102,7 @@ public class SettingsActivity extends Activity implements LocationListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_layout);
+        setContentView(R.layout.settings);
 
         // Registra o receiver para que o app seja avisado quando o usuário modificar as configurações de localização do dispositivo.
         filter = new IntentFilter(android.location.LocationManager.PROVIDERS_CHANGED_ACTION);
@@ -117,7 +147,7 @@ public class SettingsActivity extends Activity implements LocationListener {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                if (toggleSMS.isChecked()) {
+                if (toggleSMSbt.isChecked()) {
                     Log.i("info", "Button is on!");
                     AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
                     dialog.setMessage("ON");
@@ -131,26 +161,13 @@ public class SettingsActivity extends Activity implements LocationListener {
                     dialog.show();
                 }
             }
-        }); */
+        });*/
 
+        Intent i = getIntent();
+        username = i.getStringExtra("USERNAME");
+        password = i.getStringExtra("PASSWORD");
 
         localizarUsuario();
-    }
-
-    public void onClick(View view){
-        if (toggleSMSbt.isChecked()) {
-            Log.i("info", "Button is on!");
-            AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-            dialog.setMessage("ON");
-            dialog.setNeutralButton("OK", null);
-            dialog.show();
-        } else {
-            Log.i("info", "Button is off!");
-            AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-            dialog.setMessage("OFF");
-            dialog.setNeutralButton("OK", null);
-            dialog.show();
-        }
     }
 
     public void localizarUsuario() {
@@ -312,13 +329,14 @@ public class SettingsActivity extends Activity implements LocationListener {
 
             // Obtém a informação da precisão da localização, em metros.
             float precisao = location.getAccuracy();
+            _precisao = String.valueOf(precisao);
 
             // Se a precisão for menor ou igual à precisão mínima exigida (em metros), então mostra a localização na tela.
             // A precisão mínima exigida depende da aplicação.
             if (precisao <= precisaoMinimaExigida) {
                 // Compõe o texto de saída e acrescenta à caixa de texto.
-                String latitude = String.valueOf(location.getLatitude()).substring(0, 10);
-                String longitude = String.valueOf(location.getLongitude()).substring(0, 10);
+                latitude = String.valueOf(location.getLatitude()).substring(0, 10);
+                longitude = String.valueOf(location.getLongitude()).substring(0, 10);
                 String novaLinha = "Latitude: " + latitude + " - Longitude: " + longitude + "\nPrecisão:  " + precisao + " m\n";//- Origem dos dados: "+location.getProvider() + "\n";
                 editTextPosicoes.setText(novaLinha);
 
