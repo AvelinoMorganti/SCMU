@@ -1,2 +1,0 @@
-# SCMU
-SCMU
