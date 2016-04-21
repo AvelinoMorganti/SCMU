@@ -39,7 +39,7 @@
             android:textColor="@color/white"
             android:hint="example@whaves.com"
             android:textColorHint="@drawable/selector"
-            android:background="@drawable/border" />
+            android:background="@drawable/backwithborder" />
 
         <TextView
             android:layout_width="fill_parent"
