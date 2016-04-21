@@ -17,6 +17,10 @@ import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
 
+import org.apache.http.impl.client.BasicCookieStore;
+
+import java.util.List;
+
 
 public class SettingsActivity extends Activity implements LocationListener {
 
@@ -67,7 +71,7 @@ public class SettingsActivity extends Activity implements LocationListener {
         //Requests funcionando...
 
         request = new Request();
-        String req = request.getStateJSON(username, password);
+        String req = request.getStateJSON();
 
         Gson gson = new Gson();
         State state = gson.fromJson(req, State.class);
@@ -118,6 +122,11 @@ public class SettingsActivity extends Activity implements LocationListener {
         // Limpa o editText.
         editTextPosicoes.setText("");
 
+        Intent i = getIntent();
+        CookieStoreImpl data = (CookieStoreImpl) i.getSerializableExtra("COOKIESTORE");
+
+        BasicCookieStore ck = Utils.createApacheCookieStore( (List<CookiesImpl>) data.getData() );
+
        /* toggleSMSbt = (ToggleButton) findViewById(R.id.toggleSMS);
         toggleSMSbt.setEnabled(true);
         toggleSMSbt.setOnClickListener(new OnClickListener() {
@@ -163,9 +172,6 @@ public class SettingsActivity extends Activity implements LocationListener {
             }
         });*/
 
-        Intent i = getIntent();
-        username = i.getStringExtra("USERNAME");
-        password = i.getStringExtra("PASSWORD");
 
         localizarUsuario();
     }

@@ -147,27 +147,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     textErrorMsg.setTextColor(Color.parseColor("#FFFFFFFF"));
 
                     Intent itPainel = new Intent(this, PainelActivity.class);
+                    CookieStoreImpl ck = Utils.createCookieStoreImpl(cookieStore);
 
-                    List<Cookie> cookies = cookieStore.getCookies();
-                    List<CookiesImpl> listCookies = new ArrayList<CookiesImpl>();
-                    for (Cookie c : cookies) {
-                        listCookies.add(
-                                new CookiesImpl(c.getName(),
-                                        c.getValue(),
-                                        c.getComment(),
-                                        c.getCommentURL(),
-                                        c.getDomain(),
-                                        c.getExpiryDate(),
-                                        c.getPath(),
-                                        c.getPorts(),
-                                        c.getVersion(),
-                                        c.isPersistent(),
-                                        c.isSecure(),
-                                        c.isExpired(new Date())));
-                    }
+                    itPainel.putExtra("COOKIESTORE", ck);
 
-
-                    itPainel.putExtra("COOKIESTORE", new CookieStoreImpl(listCookies));
                     itPainel.putExtra("BLOGIN", "true");
                     itPainel.putExtra("USERNAME", username);
                     itPainel.putExtra("PASSWORD", password);
@@ -236,17 +219,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 //ret = w.getStateJSON(cs);
 //Log.i("JSON 3: ", "retorno 3: " + ret);
 //showMessage("JSON 3: " + ret, "OK");
-           /* Intent intent = new Intent(this, MainActivity.class);
 
-            List<Cookie> cookies =  cookieStore.getCookies();
-            int i=0;
-            for(Cookie c : cookies ){
-                intent.putExtra("cookieKey"+i, c.getName().toString());
-                intent.putExtra("cookieValue"+i, c.getValue().toString());
-                i++;
-            }
-            startActivity(intent);
-            i=0;*/
 
 
 ////////************************************************

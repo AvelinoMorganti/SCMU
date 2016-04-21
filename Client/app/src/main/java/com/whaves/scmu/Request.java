@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
@@ -29,9 +30,12 @@ import java.util.List;
 public class Request {
 
     private GoogleApiClient client;
-    CookieStore cookieStore;
+    private CookieStore cookieStore;
 
-    public Request() {
+    public Request() {};
+
+    public Request(BasicCookieStore cookieStore) {
+        this.cookieStore = cookieStore;
     }
 
     public String getStateJSON() {
@@ -265,6 +269,10 @@ public class Request {
         ConnManagerParams.setTimeout(params, 5000);
 
         return mHttpClient;
+    }
+
+    public CookieStore getCookieStore(){
+        return cookieStore;
     }
 }
 
