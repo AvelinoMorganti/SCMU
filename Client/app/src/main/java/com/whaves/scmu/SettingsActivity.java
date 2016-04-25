@@ -19,19 +19,30 @@ import com.google.gson.Gson;
 
 import org.apache.http.impl.client.BasicCookieStore;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SettingsActivity extends Activity implements LocationListener {
 
-    private String latitude;
-    private String longitude;
-    private String altitude;
-    private String _precisao;
-    private String username;
-    private String password;
+    //Request/response
     private Request request;
     private State state;
+    CookieStoreImpl data;
+
+    //Constants
+    int time = 1000 * 5;             //call function every 5 seconds
+    int i = 0;
+    private Timer myTimer;
+
+
+    private String latitude = "";
+    private String longitude = "";
+    private String altitude;
+    private String _precisao;
 
     private int precisaoMinimaExigida = 30;//2000    // Precisão do serviço de localização em metros.
     private int intervaloTempoLeituraGPS = 1000; // De quanto em quanto tempo (milissegundos) avisará que mudou de posição.
@@ -60,49 +71,6 @@ public class SettingsActivity extends Activity implements LocationListener {
     // Cria um Broadcast Receiver para que a GPSActivity seja avisada caso o usuário mude as configurações de localização por fora do app
     // (deslizando a tela para baixo e clicando no ícone do GPS, por exemplo).
     // Isso é necessário porque durante a execução, o usuário tem como mudar as configurações de localização sem usar o próprio aplicativo.
-
-    public void onClick(View view) {
-
-
-    }
-
-    public void setGPS(View view) {
-
-        //Requests funcionando...
-
-        request = new Request();
-        String req = request.getStateJSON();
-
-        Gson gson = new Gson();
-        State state = gson.fromJson(req, State.class);
-        state.setLatitude(latitude);
-        state.setLongitude(longitude);
-
-        String json = gson.toJson(state);
-
-        request.setStateJSON(username, password, json);
-
-
-        AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-        dialog.setMessage("The position of your home has been updated");
-        dialog.setNeutralButton("OK", null);
-        dialog.show();
-    }
-
-    public void back(View v) {
-        finish();
-    }
-
-    BroadcastReceiver bReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context arg0, Intent arg1) {
-            // Chama o método que localiza o usuário.
-            localizarUsuario();
-
-        }
-    };
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,57 +91,150 @@ public class SettingsActivity extends Activity implements LocationListener {
         editTextPosicoes.setText("");
 
         Intent i = getIntent();
-        CookieStoreImpl data = (CookieStoreImpl) i.getSerializableExtra("COOKIESTORE");
+        data = (CookieStoreImpl) i.getSerializableExtra("COOKIESTORE");
 
-        BasicCookieStore ck = Utils.createApacheCookieStore( (List<CookiesImpl>) data.getData() );
 
-       /* toggleSMSbt = (ToggleButton) findViewById(R.id.toggleSMS);
-        toggleSMSbt.setEnabled(true);
-        toggleSMSbt.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                StringBuffer result = new StringBuffer();
-                if (toggleSMSbt.isChecked()) {
-                    Log.i("info", "Button is on!");
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-                    dialog.setMessage("ON");
-                    dialog.setNeutralButton("OK", null);
-                    dialog.show();
-                } else {
-                    Log.i("info", "Button is off!");
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-                    dialog.setMessage("OFF");
-                    dialog.setNeutralButton("OK", null);
-                    dialog.show();
-                }
-
-            }
-
-        });*/
-       /* toggleSMS.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                if (toggleSMSbt.isChecked()) {
-                    Log.i("info", "Button is on!");
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-                    dialog.setMessage("ON");
-                    dialog.setNeutralButton("OK", null);
-                    dialog.show();
-                } else {
-                    Log.i("info", "Button is off!");
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
-                    dialog.setMessage("OFF");
-                    dialog.setNeutralButton("OK", null);
-                    dialog.show();
-                }
-            }
-        });*/
-
+        // get your ToggleButton
+        toggleSMSbt = (ToggleButton) findViewById(R.id.toggleSMS);
 
         localizarUsuario();
+        //actualizar();
+
+        myTimer = new Timer();
+        myTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                TimerMethod();
+            }
+
+        }, 0, time);
+    }
+
+    public void actualizar() {
+        BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+        request = new Request(ck);
+
+        String response = request.getStateJSON(ck);
+
+        Gson gson = new Gson();
+        state = gson.fromJson(response, State.class);
+
+        toggleSMSbt.setChecked(state.isSmsNotifications());
+    }
+
+    public void setSMS(View view) {
+        if (((ToggleButton) view).isChecked()) {
+            try {
+                BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+                request = new Request(ck);
+
+                String response = request.getStateJSON(ck);
+
+                Gson gson = new Gson();
+                state = gson.fromJson(response, State.class);
+                state.setSmsNotifications(true);
+
+                String json = gson.toJson(state);
+                request.setStateJSON(ck, json);
+
+                showMessage("Automatic SMS notifications are Active.\nNow, police and firefighters receive\nAutomatic notifications", "OK");
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(),
+                        "Network error. Please make sure your Wifi is active and try again.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            try {
+                BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+                request = new Request(ck);
+
+                String response = request.getStateJSON(ck);
+
+                Gson gson = new Gson();
+                state = gson.fromJson(response, State.class);
+                state.setSmsNotifications(false);
+
+                String json = gson.toJson(state);
+                request.setStateJSON(ck, json);
+
+                showMessage("Now, Automatic SMS notifications is Inactive", "OK");
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(),
+                        "Network error. Please make sure your Wifi is active and try again.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void setGPS(View view) {
+        try {
+            if (latitude.isEmpty() ||
+                    longitude.isEmpty() ||
+                    latitude == null ||
+                    longitude == null) {
+                Toast.makeText(getApplicationContext(),
+                        "GPS data is empty. Please make sure your GPS is active, go to an open spot and try again.", Toast.LENGTH_SHORT).show();
+            } else {
+                BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+                request = new Request(ck);
+
+                String response = request.getStateJSON(ck);
+                //showMessage(response, "OK");
+
+                Gson gson = new Gson();
+                state = gson.fromJson(response, State.class);
+
+                double distance = HaversineAlgorithm.HaversineInM(
+                        Double.parseDouble(state.getLatitude()),
+                        Double.parseDouble(state.getLongitude()),
+                        Double.parseDouble(latitude),
+                        Double.parseDouble(longitude));
+
+                //showMessage("Distancia é:" + distance, "OKAY");
+
+                state.setLatitude(latitude);
+                state.setLongitude(longitude);
+
+                String json = gson.toJson(state);
+                request.setStateJSON(ck, json);
+
+                NumberFormat nf = new DecimalFormat("##,######");
+                nf.setMaximumFractionDigits(3);
+                nf.setMinimumFractionDigits(3);
+
+                showMessage("The position of your home has been updated." +
+                        "\nDistance from the last position: "
+                        +nf.format(distance) +"m", "OK");
+
+                latitude = "";
+                longitude = "";
+            }
+        } catch (Exception e) {
+            // Toast.makeText(getApplicationContext(),
+            //       e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),
+                    "Network error. Please make sure your Wifi is active and try again.", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void back(View v) {
+        finish();
+    }
+
+    BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            // Chama o método que localiza o usuário.
+            localizarUsuario();
+
+        }
+    };
+
+    public String getLatitude() {
+        return this.latitude;
+    }
+
+    public String getLongitude() {
+        return this.longitude;
     }
 
     public void localizarUsuario() {
@@ -207,18 +268,20 @@ public class SettingsActivity extends Activity implements LocationListener {
                 // Monta a caixa de diálogo.
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
                 alertDialogBuilder
-                        .setMessage("O serviço de localização está desabilitado. Deseja mudar a configuração?")
+                        //.setMessage("O serviço de localização está desabilitado. Deseja mudar a configuração?")
+                        .setMessage("The location service is disabled. Do you want to change the configuration?")
                         .setCancelable(false)
-                        .setPositiveButton("Configurar", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Configure", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 abreConfiguracaoDoDispositivo();
                             }
                         });
 
-                alertDialogBuilder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
-                        editTextPosicoes.setText("Selecione uma forma de obter a localização\npelo menu Configurar.");
+                        //editTextPosicoes.setText("Selecione uma forma de obter a localização\npelo menu Configurar.");
+                        editTextPosicoes.setText("Please select a way to get\n the location in Setup menu.");
                     }
                 });
 
@@ -244,15 +307,16 @@ public class SettingsActivity extends Activity implements LocationListener {
                     // Monta a caixa de diálogo.
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
                     alertDialogBuilder
-                            .setMessage("Gostaria de habilitar o GPS para uma precisão maior?")
+                            //.setMessage("Gostaria de habilitar o GPS para uma precisão maior?")
+                            .setMessage("Would you like to enable GPS for greater accuracy?")
                             .setCancelable(false)
-                            .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     abreConfiguracaoDoDispositivo();
                                 }
                             });
 
-                    alertDialogBuilder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                    alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.cancel();
                             configuraProvedorREDE();
@@ -325,7 +389,6 @@ public class SettingsActivity extends Activity implements LocationListener {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTimeNETWORK, minDistanceNETWORK, this);
     }
 
-
     @Override
     public void onLocationChanged(Location location) {
         // Este método será chamado toda vez que houver uma atualização da localização do usuário.
@@ -343,11 +406,12 @@ public class SettingsActivity extends Activity implements LocationListener {
                 // Compõe o texto de saída e acrescenta à caixa de texto.
                 latitude = String.valueOf(location.getLatitude()).substring(0, 10);
                 longitude = String.valueOf(location.getLongitude()).substring(0, 10);
-                String novaLinha = "Latitude: " + latitude + " - Longitude: " + longitude + "\nPrecisão:  " + precisao + " m\n";//- Origem dos dados: "+location.getProvider() + "\n";
+                String novaLinha = "Latitude: " + latitude + " - Longitude: " + longitude + "\nAccuracy:  " + precisao + " m\n";//- Origem dos dados: "+location.getProvider() + "\n";
                 editTextPosicoes.setText(novaLinha);
 
                 // Rola o texto da caixa para baixo.
                 scroller.smoothScrollTo(0, editTextPosicoes.getBottom());
+
 
             }
         } catch (Exception e) {
@@ -395,5 +459,34 @@ public class SettingsActivity extends Activity implements LocationListener {
         return super.onOptionsItemSelected(item);
     }
 
+    public void showMessage(String msg, String button) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
+        dialog.setMessage(msg);
+        dialog.setNeutralButton(button, null);
+        dialog.show();
+    }
+
+    private void TimerMethod() {
+        //This method is called directly by the timer
+        //and runs in the same thread as the timer.
+        //We call the method that will work with the UI
+        //through the runOnUiThread method.
+        this.runOnUiThread(Timer_Tick);
+
+    }
+
+
+    private Runnable Timer_Tick = new Runnable() {
+        //This method runs in the same thread as the UI.
+        //Do something to the UI thread here
+        public void run() {
+            try {
+                actualizar();
+            } catch (Exception e) {
+                //Toast.makeText(getApplicationContext(),
+                //      "Network error. Please, try again.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
 }

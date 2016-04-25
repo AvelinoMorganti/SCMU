@@ -8,7 +8,7 @@
     <string name="textAlarm1">Alarm 1:</string>
     <string name="textOptions">Options</string>
     <string name="textSettings">Settings</string>
-    <string name="textSMSNotifications">SMS Notifications</string>
+    <string name="textSMSNotifications">Automatic notifications</string>
     <string name="textLocation">Set current location as home? </string>
     <string name="textYes">Yes</string>
     <string name="textBack">Back</string>
@@ -21,5 +21,6 @@
     <string name="action_settings">Configure</string>
 
     <string name="gps_msg">Current position: </string>
+    <string name="textPainel">Painel</string>
 
 </resources>

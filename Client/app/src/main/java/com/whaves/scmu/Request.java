@@ -29,7 +29,6 @@ import java.util.List;
 
 public class Request {
 
-    private GoogleApiClient client;
     private CookieStore cookieStore;
 
     public Request() {};
@@ -37,6 +36,11 @@ public class Request {
     public Request(BasicCookieStore cookieStore) {
         this.cookieStore = cookieStore;
     }
+
+    public Request(CookieStoreImpl data) {
+        this.cookieStore = (CookieStore) Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+    }
+
 
     public String getStateJSON() {
         try {
@@ -121,6 +125,28 @@ public class Request {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setStateJSON(String json) {
+        try {
+            HttpClient client = getHttpClient();
+            /********************* POST COM COOKIES *****************************/
+            HttpContext localContext = new BasicHttpContext();
+            localContext.setAttribute(ClientContext.COOKIE_STORE, this.cookieStore);
+            HttpPost request_with_cookies = new HttpPost("http://whaves.com/scmu/setState");
+
+            //Com parâmetros...
+            List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
+            urlParameters.add(new BasicNameValuePair("json", json));
+            request_with_cookies.setEntity(new UrlEncodedFormEntity(urlParameters, HTTP.UTF_8));
+            HttpResponse response_with_cookies = client.execute(request_with_cookies, localContext);
+
+            String responseAsString = EntityUtils.toString(response_with_cookies.getEntity());
+            Log.w("setStateJSON(c,json)", responseAsString);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setStateJSON(CookieStore cookie, String json) {
@@ -250,9 +276,9 @@ public class Request {
 
 
             /**********************************/
-            Log.w("COOKIE", cookieStore.toString());
-            String responseAsString = EntityUtils.toString(response.getEntity());
-            Log.e("authPost(user, pass)", responseAsString);
+            //Log.w("COOKIE", cookieStore.toString());
+            //String responseAsString = EntityUtils.toString(response.getEntity());
+            //Log.e("authPost(user, pass)", responseAsString);
 
             return cookieStore;
         } catch (Exception e) {

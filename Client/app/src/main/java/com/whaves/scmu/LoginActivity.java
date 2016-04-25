@@ -65,7 +65,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private TextView textPassword;
     private EditText editLogin;
     private EditText editPassword;
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,63 +102,46 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     editPassword.setHint("••••••••••");
             }
         });
-
-       /* textUsername.setOnClickListener(new View.OnClickListener() {
-            public void onFocusChange (View v,boolean hasFocus){
-                if (hasFocus)
-                    Toast.makeText(getApplicationContext(),
-                            "Username", Toast.LENGTH_SHORT).show();
-            }
-        });*/
-
-/*TODO
-
--> quando pressionar no textview mudar o foco para o edit view correspondente
-->
-
-*/
     }
 
     @Override
     public void onClick(View v) {
         if (v == buttonSettings) {
-            String username = editLogin.getText().toString();
-            String password = editPassword.getText().toString();
+            String username = editLogin.getText().toString().trim();
+            String password = editPassword.getText().toString().trim();
 
             if (username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(getApplicationContext(),
                         "Username or password is empty", Toast.LENGTH_SHORT).show();
 
             } else {
-                //Autenticação
-                Request w = new Request();
-                CookieStore cookieStore = w.authPost(username, password);
-                if (cookieStore == null) {
-                    //Usuário não autenticado..
-                    Log.wtf("Cookie null?", "NULL");
-                    //textErrorMsg.setText("Username or password is incorrect");
-                    //textErrorMsg.setTextColor(Color.parseColor("#FFFF0000"));
-                    //showMessage("Login ou senha incorretos", "OK");
-                    Toast.makeText(getApplicationContext(),
-                            "Username or password is incorrect", Toast.LENGTH_SHORT).show();
-                } else {
-                    textErrorMsg.setText("");
-                    textErrorMsg.setTextColor(Color.parseColor("#FFFFFFFF"));
 
-                    Intent itPainel = new Intent(this, PainelActivity.class);
-                    CookieStoreImpl ck = Utils.createCookieStoreImpl(cookieStore);
+                try {
+                    Request w = new Request();
+                    CookieStore cookieStore = w.authPost(username, password);
 
-                    itPainel.putExtra("COOKIESTORE", ck);
+                    if (cookieStore == null) {
+                        Log.wtf("Cookie null?", "NULL");
+                        Toast.makeText(getApplicationContext(),
+                                "Username or password is incorrect", Toast.LENGTH_SHORT).show();
+                    } else {
+                        textErrorMsg.setText("");
+                        textErrorMsg.setTextColor(Color.parseColor("#FFFFFFFF"));
 
-                    itPainel.putExtra("BLOGIN", "true");
-                    itPainel.putExtra("USERNAME", username);
-                    itPainel.putExtra("PASSWORD", password);
+                        Intent itPainel = new Intent(this, PainelActivity.class);
+                        CookieStoreImpl ck = Utils.createCookieStoreImpl(cookieStore);
+
+                        itPainel.putExtra("COOKIESTORE", ck);
 
                /*CookieManager cookieManager = CookieManager.getInstance();
                 cookieManager.setAcceptCookie(true);
                 cookieManager.getCookie()*/
 
-                    startActivity(itPainel);
+                        startActivity(itPainel);
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),
+                            "Network error. Please, try again.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -168,42 +150,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     //Quando o botao: "voltar", for pressionado, volta a Painel.
     @Override
     public void onBackPressed() {
-        //Intent it = new Intent(this, PainelActivity.class);
-        //startActivity(it);
     }
-
-    /*
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        showMessage("onRestart", "onRestart");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        showMessage("onPause", "onPause");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        showMessage("onResume", "onResume");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        showMessage("onStart", "onStart");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        showMessage("onStop", "onStop");
-    }
-
-    */
 
     public void showMessage(String msg, String button) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this);
@@ -213,32 +160,3 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     }
 }
 
-
-//w.setStateJSON(cs, "{\"id\":16,\"lamp\":true,\"alarm\":true,\"smsNotifications\":true,\"latitude\":\"1\",\"longitude\":\"1\",\"harmfulGases\":1.0,\"luminosity\":1.0}");
-
-//ret = w.getStateJSON(cs);
-//Log.i("JSON 3: ", "retorno 3: " + ret);
-//showMessage("JSON 3: " + ret, "OK");
-
-
-
-////////************************************************
-           /*  List<Cookie> cookies = cookieStore.getCookies();
-            Intent i = new Intent(this, MainActivity.class);
-
-
-            List<CookiesImpl> listCookies = new ArrayList<CookiesImpl>();
-            for (Cookie c : cookies)
-                listCookies.add(new CookiesImpl(c.getName(), c.getValue()));
-
-            i.putExtra("COOKIESTORE", new CookieStoreImpl(listCookies));
-
-
-            startActivity(i);
-
-            /***********************************************/
-            /*blogin = true;
-
-            Intent it = new Intent(this, PainelActivity.class);
-            startActivity(it);
-            */

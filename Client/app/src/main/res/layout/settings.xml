@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/textLocation"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Button
                 android:id="@+id/buttonGPS"
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/textSMSNotifications"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ToggleButton
                 android:id="@+id/toggleSMS"
@@ -60,7 +60,7 @@
                 android:text="ToggleButton"
                 android:textOn="ON"
                 android:textOff="OFF"
-                android:onClick="onClick"
+                android:onClick="setSMS"
                 />
         </LinearLayout>
 
@@ -104,7 +104,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="-15dp"
                 android:onClick="back"
-                android:text="@string/textBack" />
+                android:text="@string/textPainel" />
 
         </LinearLayout>
 

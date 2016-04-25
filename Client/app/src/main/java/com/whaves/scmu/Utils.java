@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.whaves.scmu.CookiesImpl;
+import com.whaves.scmu.CookieStoreImpl;
+
 /**
  * Created by Douglas on 21/04/2016.
  */
@@ -38,21 +41,28 @@ public class Utils {
         return new CookieStoreImpl(listCookies);
     }
 
-
     public static BasicCookieStore createApacheCookieStore(List<CookiesImpl> cookiesList){
 
-        BasicClientCookie c1 = new BasicClientCookie(cookiesList.get(0).getName(),
-                cookiesList.get(0).getValue() );
-        BasicClientCookie c2 = new BasicClientCookie(cookiesList.get(1).getName(),
-                cookiesList.get(1).getValue() );
-        BasicClientCookie c3 = new BasicClientCookie(cookiesList.get(2).getName(),
-                cookiesList.get(2).getValue() );
-
+        BasicClientCookie c[] = new BasicClientCookie[cookiesList.size()];
         BasicCookieStore ck = new BasicCookieStore();
-        ck.addCookie(c1);
-        ck.addCookie(c1);
-        ck.addCookie(c1);
+        int i = 0;
+
+        for(CookiesImpl a: cookiesList){
+            c[i] = new BasicClientCookie(a.getName(), a.getValue());
+            c[i].setComment(a.getComment());
+            //c[i].setCreationDate(a.g);
+            c[i].setDomain(a.getDomain());
+            c[i].setExpiryDate(a.getExpiryDate());
+            c[i].setPath(a.getPath());
+            c[i].setSecure(a.isSecure());
+            c[i].setVersion(a.getVersion());
+            ck.addCookie(c[i]);
+            i++;
+       }
+        //CookieStore asd = (CookieStore) ck;
 
         return ck;
     }
+
+
 }

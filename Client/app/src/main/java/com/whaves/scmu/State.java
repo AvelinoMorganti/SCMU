@@ -65,12 +65,12 @@ public class State {
         this.alarm = alarm;
     }
 
-    public boolean isSms_notifications() {
+    public boolean isSmsNotifications() {
         return smsNotifications;
     }
 
-    public void setSms_notifications(boolean sms_notifications) {
-        this.smsNotifications = sms_notifications;
+    public void setSmsNotifications(boolean smsNotifications) {
+        this.smsNotifications = smsNotifications;
     }
 
     public String getLatitude() {

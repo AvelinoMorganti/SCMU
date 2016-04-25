@@ -33,15 +33,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.painel);
 
+
         Intent itLogin = new Intent(this, LoginActivity.class);
         startActivity(itLogin);
-
-        /*
-        *
-        *
-        * Se voltar para MainActivity chamar Painel ou Login*/
-
-
     }
 
     public void showMessage(String msg, String button) {
@@ -68,24 +62,24 @@ public class MainActivity extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        showMessage("onPause", "onPause");
+        //showMessage("onPause", "onPause");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        showMessage("onResume", "onResume");
+        //showMessage("onResume", "onResume");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        showMessage("onStart", "onStart");
+        //showMessage("onStart", "onStart");
     }
 
     /*@Override
     public void onStop() {
         super.onStop();
-        showMessage("onStop", "onStop");
+        //showMessage("onStop", "onStop");
     }*/
 }

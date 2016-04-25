@@ -1,54 +1,55 @@
 package com.whaves.scmu;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.fingerprint.FingerprintManager;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.OptionalDataException;
-import java.io.StreamCorruptedException;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.Format;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class PainelActivity extends Activity implements View.OnClickListener {
 
+
+    //Components
     private Button buttonSettings;
     private TextView textLum;
     private TextView textGas;
     private Switch switchLamp;
     private Switch switchAlarm;
 
-
-    int time = 5000;             //call function every 3 seconds
+    //Constants
+    int time = 1000 * 5;             //call function every 10 seconds
     int i = 0;
     private Timer myTimer;
-    private String username;
-    private String password;
+
+    //Request/response
     private Request request;
     private State state;
+    CookieStoreImpl data;
+
+    //Dialogs
+    AlertDialog alert;
+    boolean showAlert;
+    boolean showAlertInThisSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +58,8 @@ public class PainelActivity extends Activity implements View.OnClickListener {
 
         textLum = (TextView) findViewById(R.id.textLum);
         textGas = (TextView) findViewById(R.id.textGas);
-
         switchLamp = (Switch) findViewById(R.id.switchLamp);
         switchAlarm = (Switch) findViewById(R.id.switchAlarm);
-
-
-
         buttonSettings = (Button) findViewById(R.id.buttonSettings);
         buttonSettings.setOnClickListener(this);
 
@@ -76,37 +73,119 @@ public class PainelActivity extends Activity implements View.OnClickListener {
         }, 0, time);
 
         Intent i = getIntent();
-        username = i.getStringExtra("USERNAME");
-        password = i.getStringExtra("PASSWORD");
+        data = (CookieStoreImpl) i.getSerializableExtra("COOKIESTORE");
+
+        //actualizar();
+        showAlert = true;
+        showAlertInThisSession = true;
+
+
     }
 
+    public void actualizar() {
+        BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+
+        request = new Request(ck);
+        String response = request.getStateJSON(ck);
+
+        Gson gson = new Gson();
+        State state = gson.fromJson(response, State.class);
+
+        //Atualiza botões
+        switchAlarm.setChecked(state.isAlarm());
+        switchLamp.setChecked(state.isLamp());
+
+        double lum = state.getLuminosity();
+        double gas = state.getHarmfulGases();
+
+        NumberFormat nf = new DecimalFormat("#,###");
+        nf.setMaximumFractionDigits(3);
+        nf.setMinimumFractionDigits(3);
+
+        //Atualiza sensores
+        textLum.setText("Luminosity: " + String.valueOf(nf.format(lum)) + "%"); //lux
+        textGas.setText("Air quality: " + String.valueOf(nf.format(gas)) + "% Pollution");//ppm
+
+        if (gas >= 15.0 && gas < 25.00) {
+            if (showAlert && showAlertInThisSession) {
+                showMessageDialog("Bad air quality. Be careful\n");
+            }
+        }
+        if (gas >= 25.0) {
+            if (showAlert && showAlertInThisSession) {
+                showMessageDialog("Something is wrong. Very bad air quality\n\nFire?\n");
+            }
+        }
+   }
 
     @Override
     public void onClick(View v) {
         if (v == buttonSettings) {
-
-            Intent i = getIntent();
-            CookieStoreImpl data = (CookieStoreImpl) i.getSerializableExtra("COOKIESTORE");
-
-            List<CookiesImpl> cookiesList = (List<CookiesImpl>) data.getData();
-
-            Log.wtf("0000000", cookiesList.get(0).getValue());
-            Log.wtf("1111111", cookiesList.get(1).getValue());
-            Log.wtf("2222222", cookiesList.get(2).getValue());
-
-
-            /*
-            Request request = new Request();
-            String response = request.getStateJSON(cookieStore);
-            showMessage(response, "OK");
-            */
-
-
             Intent itSettings = new Intent(this, SettingsActivity.class);
-            itSettings.putExtra("USERNAME", username);
-            itSettings.putExtra("PASSWORD", password);
+            itSettings.putExtra("COOKIESTORE", data);
             startActivity(itSettings);
+        }
+    }
 
+    public void setLamp(View v) {
+        if (((Switch) v).isChecked()) {
+            setTypeRequest("lamp", true);
+        } else {
+            setTypeRequest("lamp", false);
+        }
+    }
+
+    public void setAlarm(View v) {
+        setTypeRequest("alarm", ((Switch) v).isChecked());
+    }
+
+    public void setTypeRequest(String type, boolean value) {
+
+        try {
+            if (type.equals("lamp")) {
+
+                BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+                request = new Request(ck);
+
+                String response = request.getStateJSON(ck);
+
+                Gson gson = new Gson();
+                state = gson.fromJson(response, State.class);
+                state.setLamp(value);
+
+                String json = gson.toJson(state);
+                request.setStateJSON(ck, json);
+
+                if (value) {
+                    showMessage("LAMP ON", "OK");
+                } else {
+                    showMessage("LAMP OFF", "OK");
+                }
+            }
+
+
+            if (type.equals("alarm")) {
+                BasicCookieStore ck = Utils.createApacheCookieStore((List<CookiesImpl>) data.getData());
+                request = new Request(ck);
+
+                String response = request.getStateJSON(ck);
+
+                Gson gson = new Gson();
+                state = gson.fromJson(response, State.class);
+                state.setAlarm(value);
+
+                String json = gson.toJson(state);
+                request.setStateJSON(ck, json);
+
+                if (value) {
+                    showMessage("ALARM ON", "OK");
+                } else {
+                    showMessage("ALARM OFF", "OK");
+                }
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),
+                    "Network error. Please make sure your Wifi is active and try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -124,41 +203,118 @@ public class PainelActivity extends Activity implements View.OnClickListener {
         //This method runs in the same thread as the UI.
         //Do something to the UI thread here
         public void run() {
-            //textLum.setText(i + "s");
-            //i+=5;
-
-            double lum =  60.0 + Math.random() * 40;
-            double air = Math.random() * 100;
-
-            NumberFormat nf= new DecimalFormat("#.##");
-            nf.setMaximumFractionDigits(2);
-            nf.setMinimumFractionDigits(2);
-            //nf.setRoundingMode(RoundingMode.HALF_UP);
-
-            //DecimalFormat df = new DecimalFormat("#0,00");
-
-            textLum.setText("Luminosity: " + String.valueOf(nf.format(lum))+ "%");
-            textGas.setText("Air quality: " + String.valueOf(nf.format(air)) +"% Pollution");
-
-            //Requests funcionando...
-            /*
-            request = new Request();
-            String req = request.getStateJSON(username, password);
-
-            Gson gson = new Gson();
-            State a = gson.fromJson(req, State.class);
-            textGas.setText(String.valueOf(a.getHarmfulGases()));
-            textLum.setText(String.valueOf(a.getLuminosity()));*/
-            //TODO - GET from getState
-
+            try {
+                actualizar();
+            } catch (Exception e) {
+                //Toast.makeText(getApplicationContext(),
+                //      "Network error. Please, try again.", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
-    public void showMessage(String msg, String button) {
+    public void showMessageDialog(String msg) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(PainelActivity.this);
         dialog.setMessage(msg);
-        dialog.setNeutralButton(button, null);
-        dialog.show();
+        dialog.setCancelable(false);
+
+        dialog.setPositiveButton("Hide", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                showAlert = true;
+            }
+        });
+        dialog.setNeutralButton("Call the\nfirefighters", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                showAlert = true;
+
+                showToast("Calling to firefighters...");
+
+                String telefone = "212950093";
+
+                Uri uri = Uri.parse("tel:" + telefone);
+
+                //Intent intent = new Intent(Intent.ACTION_DIAL, uri);
+                Intent intent = new Intent(Intent.ACTION_CALL, uri);
+
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+
+                    Toast.makeText(getApplicationContext(),
+                            "No permission to call!", Toast.LENGTH_SHORT).show();
+
+/*                    int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
+                            Manifest.permission.CALL_PHONE);
+
+                    // Should we show an explanation?
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(PainelActivity.this,
+                            Manifest.permission.CALL_PHONE)) {
+
+                        // Show an expanation to the user *asynchronously* -- don't block
+                        // this thread waiting for the user's response! After the user
+                        // sees the explanation, try again to request the permission.
+
+                    } else {
+
+                        // No explanation needed, we can request the permission.
+                        int NOTHING = 0;
+
+                        ActivityCompat.requestPermissions(PainelActivity.this,
+                                new String[]{Manifest.permission.CALL_PHONE},
+                                NOTHING);
+
+                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                        // app-defined int constant. The callback method gets the
+                        // result of the request.
+                    }
+                    return;s*/
+                }
+
+                startActivity(intent);
+            }
+        });
+
+        dialog.setNegativeButton("Don't show\nme anymore", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //showAlertInThisSession = false;
+                showAlert = false;
+            }
+        });
+
+
+        alert = dialog.create();
+        alert.show();
+
+        showAlert = false;
+    }
+
+
+    public void showMessage(final String msg, final String button) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(PainelActivity.this);
+                dialog.setMessage(msg);
+                dialog.setNeutralButton(button, null);
+                dialog.show();
+            }
+        });
+    }
+
+
+    public void showToast(final String msg) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void showToast(final String msg, final int duration) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, duration).show();
+            }
+        });
     }
 
     @Override
@@ -167,17 +323,3 @@ public class PainelActivity extends Activity implements View.OnClickListener {
 }
 
 
-/*new CountDownTimer(30000, 1000) {
-
-                public void onTick(long millisUntilFinished) {
-                    textLum.setText("seconds remaining: " + millisUntilFinished / 1000);
-                }
-
-                public void onFinish() {
-                    textGas.setText("done!");
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                    dialog.setMessage("baaaaaaam");
-                    dialog.setNeutralButton("Done", null);
-                    dialog.show();
-                }
-            }.start();*/
