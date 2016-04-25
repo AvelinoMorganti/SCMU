@@ -7,7 +7,7 @@ android {
         multiDexEnabled true
         applicationId "com.whaves.scmu"
         minSdkVersion 16
-        targetSdkVersion 16
+        targetSdkVersion 23
         versionCode 5
         versionName 'alpha_v0.0.5'
     }
